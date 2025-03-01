@@ -1,9 +1,14 @@
 import { prisma } from '@/lib/db'
-import { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from 'react'
+
+interface Glass {
+  id: string
+  name: string
+  code: string
+  sellPrice: number
+}
 
 export async function GlassList() {
   const glasses = await prisma.glass.findMany({
-  
     orderBy: { createdAt: 'desc' }
   })
 
@@ -11,7 +16,7 @@ export async function GlassList() {
     <div>
       <h2>Glasses</h2>
       <div className="grid gap-4">
-        {glasses.map((glass: { id: Key | null | undefined; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; code: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; sellPrice: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined }) => (
+        {glasses.map((glass: Glass) => (
           <div key={glass.id} className="p-4 border rounded">
             <h3>{glass.name}</h3>
             <p>Code: {glass.code}</p>

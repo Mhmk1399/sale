@@ -14,7 +14,7 @@ export async function createGlass(data: { name: string; code: string; sellPrice:
   } catch (error) {
     return { success: false, error: 'Failed to create glass' }
   }
-}
+}   
 
 export async function updateGlass(id: string, data: { name?: string; code?: string; sellPrice?: number }) {
   try {
