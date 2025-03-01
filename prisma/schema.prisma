@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id          Int      @id @default(autoincrement())
+  name        String   
+  email       String   @unique
+  phone       String?
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sales       Sale[]
+ 
+}
+
+
+
+
+model Glass {
+  id          String         @id @default(cuid())
+  name        String
+  code        String        @unique
+  sellPrice   Float
+  inventory   Inventory[]
+  layers      Layer[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Priority {
+  id          String         @id @default(cuid())
+  name        String
+  date        DateTime
+  price       Float
+  invoices    Invoice[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Seller {
+  id          String         @id @default(cuid())
+  name        String
+  info        String?
+  inventory   Inventory[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model GlassTreatment {
+  id          String         @id @default(cuid())
+  name        String
+  price       Float
+  layers      LayerTreatment[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model SideMaterial {
+  id          String         @id @default(cuid())
+  name        String
+  price       Float
+  inventory   Inventory[]
+  invoices    InvoiceSideMaterial[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Inventory {
+  id            String       @id @default(cuid())
+  materialType  String      // "GLASS" or "SIDE_MATERIAL"
+  glass         Glass?       @relation(fields: [glassId], references: [id])
+  glassId       String?
+  sideMaterial  SideMaterial? @relation(fields: [sideMaterialId], references: [id])
+  sideMaterialId String?
+  seller        Seller       @relation(fields: [sellerId], references: [id])
+  sellerId      String
+  buyPrice      Float
+  amount        Int
+  enteredDate   DateTime
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([glassId])
+  @@index([sideMaterialId])
+  @@index([sellerId])
+}
+
+model Layer {
+  id            String       @id @default(cuid())
+  glass         Glass        @relation(fields: [glassId], references: [id])
+  glassId       String
+  width         Float
+  height        Float
+  treatments    LayerTreatment[]
+  invoice       Invoice      @relation(fields: [invoiceId], references: [id])
+  invoiceId     String
+
+  @@index([glassId])
+  @@index([invoiceId])
+}
+
+model LayerTreatment {
+  id              String         @id @default(cuid())
+  layer          Layer          @relation(fields: [layerId], references: [id])
+  layerId        String
+  treatment      GlassTreatment @relation(fields: [treatmentId], references: [id])
+  treatmentId    String
+
+  @@index([layerId])
+  @@index([treatmentId])
+}
+
+model Invoice {
+  id            String       @id @default(cuid())
+  layers        Layer[]
+  layersLength  Int
+  type          String
+  count         Int
+  sideMaterials InvoiceSideMaterial[]
+  priority      Priority     @relation(fields: [priorityId], references: [id])
+  priorityId    String
+  customer      String
+  dueDate       DateTime
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([priorityId])
+}
+
+model InvoiceSideMaterial {
+  id            String       @id @default(cuid())
+  invoice       Invoice      @relation(fields: [invoiceId], references: [id])
+  invoiceId     String
+  sideMaterial  SideMaterial @relation(fields: [sideMaterialId], references: [id])
+  sideMaterialId String
+  quantity      Int
+
+  @@index([invoiceId])
+  @@index([sideMaterialId])
+}
