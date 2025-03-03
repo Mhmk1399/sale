@@ -16,12 +16,11 @@ datasource db {
 model Customer {
   id          Int      @id @default(autoincrement())
   name        String   
-  email       String   @unique
-  phone       String?
+  phone       String?  @unique
   address     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  sales       Sale[]
+
  
 }
 
@@ -32,7 +31,7 @@ model Glass {
   id          String         @id @default(cuid())
   name        String
   code        String        @unique
-  sellPrice   Float
+  sellPrice   String
   inventory   Inventory[]
   layers      Layer[]
   createdAt   DateTime      @default(now())
@@ -42,8 +41,8 @@ model Glass {
 model Priority {
   id          String         @id @default(cuid())
   name        String
-  date        DateTime
-  price       Float
+  date        String
+  price       String
   invoices    Invoice[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -61,8 +60,8 @@ model Seller {
 model GlassTreatment {
   id          String         @id @default(cuid())
   name        String
-  price       Float
-  layers      LayerTreatment[]
+  price       String
+  layers      Layer[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }
@@ -70,7 +69,7 @@ model GlassTreatment {
 model SideMaterial {
   id          String         @id @default(cuid())
   name        String
-  price       Float
+  price       String
   inventory   Inventory[]
   invoices    InvoiceSideMaterial[]
   createdAt   DateTime      @default(now())
@@ -86,9 +85,9 @@ model Inventory {
   sideMaterialId String?
   seller        Seller       @relation(fields: [sellerId], references: [id])
   sellerId      String
-  buyPrice      Float
-  amount        Int
-  enteredDate   DateTime
+  buyPrice      String
+  amount        String
+  enteredDate   String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
@@ -98,29 +97,20 @@ model Inventory {
 }
 
 model Layer {
-  id            String       @id @default(cuid())
-  glass         Glass        @relation(fields: [glassId], references: [id])
+  id            String          @id @default(cuid())
+  glass         Glass           @relation(fields: [glassId], references: [id])
   glassId       String
-  width         Float
-  height        Float
-  treatments    LayerTreatment[]
-  invoice       Invoice      @relation(fields: [invoiceId], references: [id])
-  invoiceId     String
+  width         String
+  height        String
+  treatments    GlassTreatment[]
+  invoice       Invoice?        @relation(fields: [invoiceId], references: [id])
+  invoiceId     String?        // Made optional with String?
 
   @@index([glassId])
   @@index([invoiceId])
 }
 
-model LayerTreatment {
-  id              String         @id @default(cuid())
-  layer          Layer          @relation(fields: [layerId], references: [id])
-  layerId        String
-  treatment      GlassTreatment @relation(fields: [treatmentId], references: [id])
-  treatmentId    String
 
-  @@index([layerId])
-  @@index([treatmentId])
-}
 
 model Invoice {
   id            String       @id @default(cuid())
